@@ -1,0 +1,71 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Post {
+  id          Int      @id @default(autoincrement())
+  title       String
+  content     String?
+  published   Boolean  @default(false)
+  author      User?    @relation(fields: [authorId], references: [id])
+  authorId    Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  images      Image[]
+  category    Category? @relation(fields: [categoryId], references: [id])
+  categoryId  Int?
+}
+
+model User {
+  id        Int     @id @default(autoincrement())
+  email     String  @unique
+  name      String?
+  password  String
+  role      String  @default("admin")
+  posts     Post[]
+  pages     Page[]
+}
+
+model Page {
+  id          Int      @id @default(autoincrement())
+  title       String
+  content     String?
+  slug        String   @unique
+  published   Boolean  @default(false)
+  author      User?    @relation(fields: [authorId], references: [id])
+  authorId    Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  images      Image[]
+}
+
+model Image {
+  id          Int      @id @default(autoincrement())
+  url         String
+  alt         String?
+  post        Post?    @relation(fields: [postId], references: [id])
+  postId      Int?
+  page        Page?    @relation(fields: [pageId], references: [id])
+  pageId      Int?
+  createdAt   DateTime @default(now())
+}
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  posts       Post[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
