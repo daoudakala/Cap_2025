@@ -2,8 +2,6 @@
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { BarChart, Users, FileText, Calendar, Settings } from 'lucide-react'
-import { verifyToken } from '../api/jwt';
-import { GetServerSideProps } from 'next';
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -24,9 +22,9 @@ export default function DashboardPage() {
   }, []);
 
   const handleLogout = async () => {
-    localStorage.removeItem("token") // Retirer le token du localStorage
-    await fetch('/api/logout', { method: 'POST' }) // Optionnel : si tu gères la déconnexion côté serveur
-    router.push('/login') // Rediriger vers la page de connexion
+    localStorage.removeItem("token"); // Retirer le token du localStorage
+    await fetch('/api/logout', { method: 'POST' }); // Optionnel : si tu gères la déconnexion côté serveur
+    router.push('/login'); // Rediriger vers la page de connexion
   }
 
   return (
@@ -125,10 +123,9 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-// Composant Carte de Statistique
 function StatCard({ icon, title, value, link }: { icon: React.ReactNode, title: string, value: number, link: string }) {
   return (
     <div className="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow">
@@ -145,10 +142,9 @@ function StatCard({ icon, title, value, link }: { icon: React.ReactNode, title: 
         Voir tous →
       </a>
     </div>
-  )
+  );
 }
 
-// Composant Bouton Dashboard
 function DashboardButton({ icon, label, onClick }: { icon: React.ReactNode, label: string, onClick: () => void }) {
   return (
     <button
@@ -160,19 +156,5 @@ function DashboardButton({ icon, label, onClick }: { icon: React.ReactNode, labe
       </div>
       <span>{label}</span>
     </button>
-  )
+  );
 }
-
-// Vérification du token JWT côté serveur
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
-  const token = req.cookies.token || ''; // On suppose que le token est dans les cookies
-
-  try {
-    const decoded = verifyToken(token); // Vérifier le token
-    return { props: { user: decoded } }; // Passer les infos de l'utilisateur à la page
-  } catch (error) {
-    res.statusCode = 302;
-    res.setHeader('Location', '/login');
-    return { props: {} }; // Rediriger vers la page de login
-  }
-};
